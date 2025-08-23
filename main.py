@@ -130,6 +130,7 @@ def main():
             for g, f in constraints:
                 if not matches_feedback(cand, g, f):
                     ok = False
+
                     break
             if ok:
                 new_candidates.append(cand)
