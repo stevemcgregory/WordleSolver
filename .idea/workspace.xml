@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="df20f8e8-faf5-4878-a15b-b939d46a685d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/WordleSolver.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
+    <list default="true" id="df20f8e8-faf5-4878-a15b-b939d46a685d" name="Changes" comment="Initial version of WordleSolver" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -21,6 +13,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/stevemcgregory/WordleSolver",
+    "accountId": "a05247ac-7d96-4e0d-b81e-0d751306c257"
+  }
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 0
 }]]></component>
@@ -56,8 +54,8 @@
       <window_info id="Commit_Guest" show_stripe_button="false" />
       <window_info id="Pull Requests" />
       <window_info id="Learn" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22535715" />
-      <window_info id="Commit" order="1" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.22535715" />
+      <window_info active="true" id="Commit" order="1" visible="true" weight="0.22535715" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" />
       <window_info anchor="bottom" id="TypeScript" />
@@ -71,7 +69,7 @@
       <window_info anchor="bottom" id="Services" order="4" />
       <window_info anchor="bottom" id="Python Packages" order="5" weight="0.1" />
       <window_info anchor="bottom" id="Python Console" order="6" weight="0.3305" />
-      <window_info active="true" anchor="bottom" id="Run" order="7" visible="true" weight="0.5493367" />
+      <window_info active="true" anchor="bottom" id="Run" order="7" visible="true" weight="0.3117914" />
       <window_info anchor="bottom" id="Debug" order="8" weight="0.3305" />
       <window_info anchor="right" id="Endpoints" />
       <window_info anchor="right" id="Coverage" side_tool="true" />
@@ -100,14 +98,27 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1755959103497</updated>
-      <workItem from="1755959104547" duration="1310000" />
+      <workItem from="1755959104547" duration="1746000" />
     </task>
+    <task id="LOCAL-00001" summary="Initial version of WordleSolver">
+      <option name="closed" value="true" />
+      <created>1755960850203</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1755960850203</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial version of WordleSolver" />
+    <option name="LAST_COMMIT_MESSAGE" value="Initial version of WordleSolver" />
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/WordleSolver$main.coverage" NAME="main Coverage Results" MODIFIED="1755960391253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/WordleSolver$main.coverage" NAME="main Coverage Results" MODIFIED="1755960418710" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
