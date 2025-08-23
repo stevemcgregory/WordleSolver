@@ -1,16 +1,27 @@
 import requests
 import sys
+import json
+import os
 from typing import List, Tuple
 
-WORD_LIST_URL = "https://darkermango.github.io/5-Letter-words/words.json"
+WORD_LIST_FILE = "words.json"
 
-
-def fetch_words(url: str = WORD_LIST_URL) -> List[str]:
+def fetch_words(filename: str = WORD_LIST_FILE) -> List[str]:
     try:
-        resp = requests.get(url, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
-        words = data.get("words", [])
+        # Resolve local path relative to this file unless absolute path is provided
+        path = filename
+        if not os.path.isabs(path):
+            base = os.path.dirname(__file__)
+            path = os.path.join(base, path)
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        # Support either a dict with "words" key or a raw list
+        if isinstance(data, dict):
+            words = data.get("words", [])
+        elif isinstance(data, list):
+            words = data
+        else:
+            words = []
         # sanitize: keep only 5-letter alphabetic words, lowercase
         return [w.lower() for w in words if isinstance(w, str) and len(w) == 5 and w.isalpha()]
     except Exception as e:
@@ -54,7 +65,7 @@ def score_word(secret: str, guess: str) -> str:
     return ''.join(feedback)
 
 
-essage = (
+message = (
     "Wordle Solver\n"
     "- Enter a 5-letter guess and the feedback pattern from the game.\n"
     "- Feedback pattern uses: g = green, y = yellow, b = gray.\n"
