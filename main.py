@@ -85,6 +85,26 @@ def matches_feedback(candidate: str, guess: str, feedback: str) -> bool:
     return score_word(candidate, guess) == feedback
 
 
+def rank_candidates(candidates: List[str]) -> List[str]:
+    """
+    Rank candidates by how common their letters are across the remaining pool.
+    Scoring rule: sum of frequencies of unique letters in the word, computed from
+    the current candidate set. Higher is better. Ties broken alphabetically.
+    """
+    if not candidates:
+        return candidates
+    from collections import Counter
+    letter_freq = Counter()
+    for w in candidates:
+        # Use unique letters to avoid over-valuing duplicates within a word
+        letter_freq.update(set(w))
+
+    def score(w: str) -> int:
+        return sum(letter_freq[ch] for ch in set(w))
+
+    return sorted(candidates, key=lambda w: (-score(w), w))
+
+
 def main():
     print(message)
     candidates = fetch_words()
@@ -97,6 +117,8 @@ def main():
     constraints: List[Tuple[str, str]] = []
 
     for attempt in range(1, 7):
+        # Sort candidates by most common letters before showing preview
+        candidates = rank_candidates(candidates)
         # Show a quick preview of current candidates
         preview = ', '.join(candidates[:20])
         print(f"\nAttempt {attempt}/6. Remaining candidates: {len(candidates)}")
@@ -134,12 +156,18 @@ def main():
                     break
             if ok:
                 new_candidates.append(cand)
+
         candidates = new_candidates
+
+        # Re-rank after filtering for the next round
+        candidates = rank_candidates(candidates)
 
         if not candidates:
             print("No candidates remain. You may have entered inconsistent feedback.")
             break
 
+    # Final ranking before output
+    candidates = rank_candidates(candidates)
     print("\nRemaining candidate words:")
     print(', '.join(candidates) if candidates else '(none)')
 
