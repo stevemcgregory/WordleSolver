@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="df20f8e8-faf5-4878-a15b-b939d46a685d" name="Changes" comment="Update added ranking to the list based on the commonality of characters in the words.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="df20f8e8-faf5-4878-a15b-b939d46a685d" name="Changes" comment="Update added ranking to the list based on the commonality of characters in the words." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -114,7 +112,7 @@
       <workItem from="1755961630508" duration="1876000" />
       <workItem from="1755986483142" duration="1243000" />
       <workItem from="1756038143463" duration="1343000" />
-      <workItem from="1756039898887" duration="535000" />
+      <workItem from="1756039898887" duration="547000" />
     </task>
     <task id="LOCAL-00001" summary="Initial version of WordleSolver">
       <option name="closed" value="true" />
@@ -164,7 +162,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756039473487</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Update added ranking to the list based on the commonality of characters in the words.">
+      <option name="closed" value="true" />
+      <created>1756040441299</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1756040441299</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
