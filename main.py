@@ -3,31 +3,29 @@ import sys
 import json
 import os
 from typing import List, Tuple
+from functools import lru_cache
+from collections import defaultdict, Counter
+from math import log2
+
+# --- keep your score_word as-is ---
 
 WORD_LIST_FILE = "words.json"
 
 def fetch_words(filename: str = WORD_LIST_FILE) -> List[str]:
     try:
-        # Resolve local path relative to this file unless absolute path is provided
         path = filename
         if not os.path.isabs(path):
-            base = os.path.dirname(__file__)
+            base = os.path.dirname(__file__) if "__file__" in globals() else os.getcwd()
             path = os.path.join(base, path)
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        # Support either a dict with "words" key or a raw list
-        if isinstance(data, dict):
-            words = data.get("words", [])
-        elif isinstance(data, list):
-            words = data
-        else:
-            words = []
-        # sanitize: keep only 5-letter alphabetic words, lowercase
-        return [w.lower() for w in words if isinstance(w, str) and len(w) == 5 and w.isalpha()]
+        words = data.get("words", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
+        # sanitize + dedupe
+        ws = sorted(set(w.lower() for w in words if isinstance(w, str) and len(w) == 5 and w.isalpha()))
+        return ws
     except Exception as e:
         print(f"Error fetching word list: {e}", file=sys.stderr)
         return []
-
 
 def score_word(secret: str, guess: str) -> str:
     """
@@ -73,37 +71,64 @@ message = (
     "- Up to 6 attempts. Type 'quit' to exit early.\n"
 )
 
+@lru_cache(maxsize=None)
+def _pattern_cached(secret: str, guess: str) -> str:
+    return score_word(secret, guess)
+
+def bucket_stats(guess: str, candidates: List[str]) -> tuple[int, float, float]:
+    buckets = defaultdict(int)
+    for s in candidates:
+        buckets[_pattern_cached(s, guess)] += 1
+    counts = list(buckets.values())
+    n = len(candidates)
+    bmax = max(counts)
+    expected = sum(c*c for c in counts) / n
+    # entropy tiebreak: prefer higher entropy => sort by -entropy
+    probs = (c / n for c in counts)
+    ent = 0.0
+    for p in probs:
+        if p > 0:
+            ent -= p * log2(p)
+    return bmax, expected, ent
+
+def _letter_freq_score_pool(S: List[str]):
+    from collections import Counter
+    freq = Counter()
+    for w in S:
+        freq.update(set(w))
+    def cover_score(w: str) -> int:
+        return sum(freq[ch] for ch in set(w))
+    return cover_score
+
+def rank_candidates_minimax(G: List[str], S: List[str]) -> list[tuple[str, tuple]]:
+    scored = []
+    for g in G:
+        bmax, expected, ent = bucket_stats(g, S)
+        scored.append((g, (bmax, expected, -ent, g)))  # minimize bmax, expected, -entropy, then alpha
+    scored.sort(key=lambda x: x[1])
+    return scored
+
+def choose_guess(candidates: List[str], guess_pool: List[str] | None = None) -> str:
+    S = candidates
+    if not S:
+        return ""
+    # Allow a larger probe pool if provided; else just S.
+    G = list(set(guess_pool)) if guess_pool else S
+
+    # Two-stage pruning to cut O(|G||S|):
+    cover_score = _letter_freq_score_pool(S)
+    K = 300 if len(S) > 2000 else 150 if len(S) > 500 else len(G)
+    G_pruned = sorted(G, key=lambda w: -cover_score(w))[:min(K, len(G))]
+
+    order = rank_candidates_minimax(G_pruned, S)
+    return order[0][0] if order else ""
 
 def normalize_feedback(s: str) -> str:
     s = s.strip().lower()
-    trans = {'.': 'b', 'x': 'b'}
-    s = ''.join(trans.get(c, c) for c in s)
-    return s
-
+    return ''.join({'x':'b','.':'b'}.get(c, c) for c in s)
 
 def matches_feedback(candidate: str, guess: str, feedback: str) -> bool:
-    return score_word(candidate, guess) == feedback
-
-
-def rank_candidates(candidates: List[str]) -> List[str]:
-    """
-    Rank candidates by how common their letters are across the remaining pool.
-    Scoring rule: sum of frequencies of unique letters in the word, computed from
-    the current candidate set. Higher is better. Ties broken alphabetically.
-    """
-    if not candidates:
-        return candidates
-    from collections import Counter
-    letter_freq = Counter()
-    for w in candidates:
-        # Use unique letters to avoid over-valuing duplicates within a word
-        letter_freq.update(set(w))
-
-    def score(w: str) -> int:
-        return sum(letter_freq[ch] for ch in set(w))
-
-    return sorted(candidates, key=lambda w: (-score(w), w))
-
+    return _pattern_cached(candidate, guess) == feedback
 
 def main():
     print(message)
@@ -117,13 +142,6 @@ def main():
     constraints: List[Tuple[str, str]] = []
 
     for attempt in range(1, 7):
-        # Sort candidates by most common letters before showing preview
-        candidates = rank_candidates(candidates)
-        # Show a quick preview of current candidates
-        preview = ', '.join(candidates[:20])
-        print(f"\nAttempt {attempt}/6. Remaining candidates: {len(candidates)}")
-        if preview:
-            print(f"Examples: {preview}{'...' if len(candidates) > 20 else ''}")
 
         guess = input("Enter your 5-letter guess (or 'quit'): ").strip().lower()
         if guess in {"quit", "exit"}:
@@ -159,18 +177,24 @@ def main():
 
         candidates = new_candidates
 
-        # Re-rank after filtering for the next round
-        candidates = rank_candidates(candidates)
+        # Choose from probe pool when large; else from S only
+        probe_pool = candidates  # or a larger list you load separately
+        best_guess = choose_guess(candidates, guess_pool=probe_pool)
+        print(f"Suggested guess: {best_guess}")
 
         if not candidates:
             print("No candidates remain. You may have entered inconsistent feedback.")
             break
 
     # Final ranking before output
-    candidates = rank_candidates(candidates)
-    print("\nRemaining candidate words:")
-    print(', '.join(candidates) if candidates else '(none)')
+    # Before input:
+    # Choose from probe pool when large; else from S only
+    probe_pool = candidates  # or a larger list you load separately
+    best_guess = choose_guess(candidates, guess_pool=probe_pool)
+    print(f"Suggested guess: {best_guess}")
 
+    # After filtering:
+    # candidates = [ ... filtered as you do ... ]
 
 if __name__ == '__main__':
     main()
