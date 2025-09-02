@@ -108,7 +108,7 @@ def rank_candidates_minimax(G: List[str], S: List[str]) -> list[tuple[str, tuple
     scored.sort(key=lambda x: x[1])
     return scored
 
-def choose_guess(candidates: List[str], guess_pool: List[str] | None = None) -> str:
+def choose_guess(candidates: List[str], guess_pool: List[str] | None = None):
     S = candidates
     if not S:
         return ""
@@ -121,7 +121,7 @@ def choose_guess(candidates: List[str], guess_pool: List[str] | None = None) -> 
     G_pruned = sorted(G, key=lambda w: -cover_score(w))[:min(K, len(G))]
 
     order = rank_candidates_minimax(G_pruned, S)
-    return order[0][0] if order else ""
+    return order if order else ""
 
 def normalize_feedback(s: str) -> str:
     s = s.strip().lower()
@@ -131,18 +131,23 @@ def matches_feedback(candidate: str, guess: str, feedback: str) -> bool:
     return _pattern_cached(candidate, guess) == feedback
 
 def main():
-    print(message)
     candidates = fetch_words()
     if not candidates:
         print("Could not load the word list. Exiting.")
         return
 
-    print(f"Loaded {len(candidates)} candidate words.")
+    print(f"Loaded {len(candidates)} candidate words. Picking 3 suggestions...")
 
     constraints: List[Tuple[str, str]] = []
 
-    for attempt in range(1, 7):
+    # Choose from probe pool when large; else from S only
+    probe_pool = candidates  # or a larger list you load separately
+    best_guess = choose_guess(candidates, guess_pool=probe_pool)
+    for i in range(0, 3):
+        print(f"Suggested guess: {best_guess[i][0]}")
+    print(message)
 
+    for attempt in range(1, 7):
         guess = input("Enter your 5-letter guess (or 'quit'): ").strip().lower()
         if guess in {"quit", "exit"}:
             break
@@ -176,22 +181,16 @@ def main():
                 new_candidates.append(cand)
 
         candidates = new_candidates
-
-        # Choose from probe pool when large; else from S only
-        probe_pool = candidates  # or a larger list you load separately
-        best_guess = choose_guess(candidates, guess_pool=probe_pool)
-        print(f"Suggested guess: {best_guess}")
-
         if not candidates:
             print("No candidates remain. You may have entered inconsistent feedback.")
             break
 
-    # Final ranking before output
-    # Before input:
-    # Choose from probe pool when large; else from S only
-    probe_pool = candidates  # or a larger list you load separately
-    best_guess = choose_guess(candidates, guess_pool=probe_pool)
-    print(f"Suggested guess: {best_guess}")
+        # Choose from probe pool when large; else from S only
+        probe_pool = candidates  # or a larger list you load separately
+        best_guess = choose_guess(candidates, guess_pool=probe_pool)
+        for i in range(min(3,len(best_guess))):
+            print(f"Suggested guess: {best_guess[i][0]}")
+
 
     # After filtering:
     # candidates = [ ... filtered as you do ... ]
