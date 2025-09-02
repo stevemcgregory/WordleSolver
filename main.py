@@ -136,15 +136,45 @@ def main():
         print("Could not load the word list. Exiting.")
         return
 
-    print(f"Loaded {len(candidates)} candidate words. Picking 3 suggestions...")
+    print(f"Loaded {len(candidates)} candidate words. Printing Top 5 Suggested Guesses:")
 
     constraints: List[Tuple[str, str]] = []
 
-    # Choose from probe pool when large; else from S only
-    probe_pool = candidates  # or a larger list you load separately
-    best_guess = choose_guess(candidates, guess_pool=probe_pool)
-    for i in range(0, 3):
-        print(f"Suggested guess: {best_guess[i][0]}")
+    # Initial suggestions with caching in initial_guess.json
+    try:
+        base_dir = os.path.dirname(__file__) if "__file__" in globals() else os.getcwd()
+        cache_path = os.path.join(base_dir, "initial_guess.json")
+    except Exception:
+        cache_path = "initial_guess.json"
+
+    initial_guesses: List[str] | None = None
+    # If file exists, try to read list from it
+    if os.path.exists(cache_path):
+        try:
+            with open(cache_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, list) and all(isinstance(x, str) for x in data):
+                initial_guesses = data
+        except Exception as e:
+            print(f"Warning: could not read initial guesses cache: {e}")
+            initial_guesses = None
+
+    # If not present or invalid, compute and write top 5
+    if initial_guesses is None:
+        probe_pool = candidates  # or a larger list you load separately
+        ranked = choose_guess(candidates, guess_pool=probe_pool)
+        top = [ranked[i][0] for i in range(min(5, len(ranked)))] if ranked else []
+        initial_guesses = top
+        try:
+            with open(cache_path, "w", encoding="utf-8") as f:
+                json.dump(initial_guesses, f)
+        except Exception as e:
+            print(f"Warning: could not write initial guesses cache: {e}")
+
+    # Print the initial guesses (up to 5)
+    for guess in initial_guesses[:5]:
+        print(f"{guess}")
+
     print(message)
 
     for attempt in range(1, 7):
@@ -188,7 +218,7 @@ def main():
         # Choose from probe pool when large; else from S only
         probe_pool = candidates  # or a larger list you load separately
         best_guess = choose_guess(candidates, guess_pool=probe_pool)
-        for i in range(min(3,len(best_guess))):
+        for i in range(min(5,len(best_guess))):
             print(f"Suggested guess: {best_guess[i][0]}")
 
 
