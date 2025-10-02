@@ -11,6 +11,12 @@ from main import (
     matches_feedback,
 )
 
+# drop-in helper for compatibility
+def rerun():
+    if hasattr(st, "rerun"):
+        st.rerun()
+    else:  # older Streamlit
+        st.experimental_rerun()
 
 def filter_candidates(candidates: List[str], constraints: List[Tuple[str, str]]) -> List[str]:
     if not constraints:
@@ -97,7 +103,7 @@ def main():
         if st.button("Reset session", type="secondary"):
             st.session_state.constraints = []
             st.session_state.candidates = all_words
-            st.experimental_rerun()
+            rerun()
 
     st.markdown(f"**Candidates remaining:** {len(st.session_state.candidates)}")
 

@@ -1,0 +1,16 @@
+# Don’t copy local venv
+.venv/
+venv/
+#Pycharm
+.idea/
+
+# Python cruft
+__pycache__/
+*.pyc
+
+# Git + IDE stuff
+.git/
+.gitignore
+*.log
+.DS_Store
+*.pyc
