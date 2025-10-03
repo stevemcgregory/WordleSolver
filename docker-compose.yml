@@ -1,5 +1,11 @@
 services:
   streamlit:
-    image: streamlit-app:latest
     build: .
-    ports: ["8501:8501"]
+    image: streamlit-app:latest
+    expose:
+      - "8501"
+    networks: [appnet]
+
+networks:
+  appnet:
+    external: true
